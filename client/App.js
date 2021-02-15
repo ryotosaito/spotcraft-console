@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { findDOMNode } from "react-dom";
 import { hot } from "react-hot-loader";
+import { io } from "socket.io-client";
 import "./App.css";
 
 class App extends Component {
@@ -17,9 +18,26 @@ class App extends Component {
 		this.handleSubmit = this.handleSubmit.bind(this);
 		this.consoleUpdate = this.consoleUpdate.bind(this);
 		this.fixConsoleSize = this.fixConsoleSize.bind(this);
-		for (let i = 1; i <= 50; i++) {
-			this.state.console += `[INFO] ${i} this is testlog.\n`;
-		}
+		this.socket = io({
+			autoConnect: false,
+			path: "/log",
+			auth: {
+				token: "",
+			},
+		});
+		this.socket.on("connect_error", (err) => {
+			alert(`${err.message}: ${err.data.content}`);
+			this.socket.disconnect();
+		});
+		this.socket.on("connect", () => {});
+		this.socket.on("init_log", (log) => {
+			this.setState({ console: log });
+			this.consoleUpdate();
+		});
+		this.socket.on("new_log", (log) => {
+			this.setState({ console: this.state.console + log });
+			this.consoleUpdate();
+		});
 	}
 
 	fixConsoleSize() {
@@ -45,9 +63,14 @@ class App extends Component {
 	}
 
 	handleSubmit(event) {
-		this.setState({ disabled: false });
-		this.consoleUpdate();
-		event.preventDefault();
+		try {
+			this.setState({ disabled: false });
+			this.consoleUpdate();
+			this.socket.auth.token = this.state.token;
+			this.socket.connect();
+		} finally {
+			event.preventDefault();
+		}
 	}
 
 	render() {
@@ -56,6 +79,7 @@ class App extends Component {
 				<h1> Minecraft Console </h1>
 				<form onSubmit={this.handleSubmit}>
 					<input
+						autoFocus
 						id="token"
 						type="text"
 						size="40"
