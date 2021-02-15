@@ -1,5 +1,6 @@
 const path = require("path");
 const webpack = require("webpack");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
 	entry: "./client/index.js",
@@ -30,5 +31,10 @@ module.exports = {
 		publicPath: "http://localhost:8000/client/build/",
 		hotOnly: true,
 	},
-	plugins: [new webpack.HotModuleReplacementPlugin()],
+	plugins: [
+		new webpack.HotModuleReplacementPlugin(),
+		new HtmlWebpackPlugin({
+			template: "./client/public/index.html",
+		}),
+	],
 };
