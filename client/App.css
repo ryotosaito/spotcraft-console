@@ -2,3 +2,29 @@
 	margin: 1rem;
 	font-family: Arial, Helvetica, sans-serif;
 }
+#console {
+	box-sizing: border-box;
+	color: white;
+	margin-top: 10px;
+	width: 100%;
+	max-width: 100%;
+	background-color: black;
+	padding: 14px;
+	font-size: 1.2rem;
+	font-family: monospace;
+}
+form {
+	margin: 10px;
+}
+input {
+	font-size: 18px;
+	font-family: monospace;
+}
+#token {
+	width: 40em;
+	max-width: 100%;
+	margin-right: 10px;
+}
+#command {
+	width: 100%;
+}
