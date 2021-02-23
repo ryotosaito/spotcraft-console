@@ -66,6 +66,7 @@ io.on("connection", (socket) => {
 	});
 });
 
+// watch minecraft server logs
 tail.on("line", function (data) {
 	console.log(data);
 	io.to("logs").emit("new_log", data + "\n");
@@ -75,6 +76,7 @@ tail.on("error", function (error) {
 	console.log("ERROR: ", error);
 });
 
+// start server
 server.listen(port, () => {
 	console.log(`Example app listening at http://localhost:${port}`);
 	console.log(`mode: ${process.env.NODE_ENV}`);
