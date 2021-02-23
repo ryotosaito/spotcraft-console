@@ -17,6 +17,7 @@ require("dotenv").config({
 	),
 });
 
+const tokenFileName = process.env.TOKEN_FILENAME;
 const logFileName = process.env.LOG_FILENAME;
 const tail = new Tail(logFileName);
 
@@ -47,10 +48,7 @@ if (development) {
 // WebSocket
 io.use((socket, next) => {
 	const token = socket.handshake.auth.token;
-	if (
-		token ==
-		"01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
-	) {
+	if (token == fs.readFileSync(tokenFileName).toString().trim()) {
 		next();
 	} else {
 		const err = new Error("not authorized");
