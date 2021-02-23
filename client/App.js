@@ -9,15 +9,17 @@ class App extends Component {
 		super(props);
 		this.state = {
 			token: "",
+			command: "",
 			console: "",
 			consoleStyle: { height: "30px" },
 			disabled: true,
 		};
 		this.consoleRef = React.createRef();
 		this.handleChange = this.handleChange.bind(this);
-		this.handleSubmit = this.handleSubmit.bind(this);
+		this.submitToken = this.submitToken.bind(this);
 		this.consoleUpdate = this.consoleUpdate.bind(this);
 		this.fixConsoleSize = this.fixConsoleSize.bind(this);
+		this.submitCommand = this.submitCommand.bind(this);
 		this.socket = io({
 			autoConnect: false,
 			path: "/log",
@@ -29,7 +31,9 @@ class App extends Component {
 			alert(`${err.message}: ${err.data.content}`);
 			this.socket.disconnect();
 		});
-		this.socket.on("connect", () => {});
+		this.socket.on("connect", () => {
+			this.setState({ disabled: false });
+		});
 		this.socket.on("init_log", (log) => {
 			this.setState({ console: log });
 			this.consoleUpdate();
@@ -59,15 +63,24 @@ class App extends Component {
 	}
 
 	handleChange(event) {
-		this.setState({ token: event.target.value });
+		this.setState({ [event.target.name]: event.target.value });
 	}
 
-	handleSubmit(event) {
+	submitToken(event) {
 		try {
-			this.setState({ disabled: false });
-			this.consoleUpdate();
 			this.socket.auth.token = this.state.token;
 			this.socket.connect();
+		} finally {
+			event.preventDefault();
+		}
+	}
+
+	submitCommand(event) {
+		try {
+			const command = this.state.command;
+			this.socket.emit("command", command);
+			this.setState({ console: this.state.console + command + "\n" });
+			this.setState({ command: "" });
 		} finally {
 			event.preventDefault();
 		}
@@ -76,25 +89,29 @@ class App extends Component {
 	render() {
 		return (
 			<div className="App">
-				<h1> Minecraft Console </h1>
-				<form onSubmit={this.handleSubmit}>
+				<h1> Minecraft Console ({process.env.NODE_ENV})</h1>
+				<form onSubmit={this.submitToken}>
 					<input
 						autoFocus
 						id="token"
 						type="text"
 						size="40"
+						name="token"
 						placeholder="token"
 						value={this.state.token}
 						onChange={this.handleChange}
 					></input>
 					<input type="submit" value="auth"></input>
 				</form>
-				<form>
+				<form onSubmit={this.submitCommand}>
 					<input
 						id="command"
 						type="text"
+						name="command"
 						placeholder="input command"
 						disabled={this.state.disabled}
+						value={this.state.command}
+						onChange={this.handleChange}
 					></input>
 				</form>
 				<textarea
