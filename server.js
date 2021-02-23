@@ -1,3 +1,4 @@
+const path = require("path");
 const express = require("express");
 const app = express();
 const server = require("http").createServer(app);
@@ -9,7 +10,25 @@ const port = 3000;
 const development = app.get("env") == "development";
 const fs = require("fs");
 const Tail = require("tail").Tail;
-const logFile = "latest.log";
+require("dotenv").config({
+	path: require("path").resolve(
+		process.cwd(),
+		`.env.${process.env.NODE_ENV}`
+	),
+});
+
+const logFileName = process.env.LOG_FILENAME;
+const tail = new Tail(logFileName);
+
+const pipeFileName = process.env.PIPE_FILENAME;
+let pipeFile;
+fs.open(
+	pipeFileName,
+	fs.constants.O_RDWR | fs.constants.O_NONBLOCK,
+	(err, fd) => {
+		pipeFile = fd;
+	}
+);
 
 app.get("/", (req, res) => {
 	res.sendFile(__dirname + "/client/public/index.html");
@@ -48,11 +67,15 @@ io.use((socket, next) => {
 
 io.on("connection", (socket) => {
 	console.log(socket.id);
-	socket.emit("init_log", fs.readFileSync(logFile).toString());
+	socket.emit("init_log", fs.readFileSync(logFileName).toString());
 	socket.join("logs");
-});
 
-const tail = new Tail(logFile);
+	socket.on("command", (command) => {
+		fs.write(pipeFile, command + "\n", (err) => {
+			if (err) console.error(err);
+		});
+	});
+});
 
 tail.on("line", function (data) {
 	console.log(data);
