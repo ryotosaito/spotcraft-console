@@ -6,11 +6,13 @@
 	},
 	"extends": "eslint:recommended",
 	"globals": {
-		"Atomics": "readonly",
-		"SharedArrayBuffer": "readonly"
+		"alert": false,
+		"window": false
 	},
 	"parserOptions": {
-		"ecmaVersion": 2018
+		"ecmaVersion": 2018,
+		"ecmaFeatures": { "jsx": true },
+		"sourceType": "module"
 	},
 	"rules": {
 		"semi": ["error", "always"]
