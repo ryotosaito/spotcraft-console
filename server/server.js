@@ -15,8 +15,8 @@ require("dotenv").config({
 });
 
 // constants
-const port = 3000;
 const development = app.get("env") == "development";
+const port = development ? 3000 : 80;
 const tokenFileName = process.env.TOKEN_FILENAME;
 const logFileName = process.env.LOG_FILENAME;
 const pipeFileName = process.env.PIPE_FILENAME;
