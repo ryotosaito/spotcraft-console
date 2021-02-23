@@ -32,12 +32,9 @@ fs.open(
 
 // React
 if (development) {
-	app.get("/", (req, res) => {
-		res.sendFile(path.resolve(__dirname, "../client/public/index.html"));
-	});
 	const { createProxyMiddleware } = require("http-proxy-middleware");
 	app.use(
-		"/bundle.js",
+		"/",
 		createProxyMiddleware({
 			target: "http://localhost:8000/",
 			changeOrigin: true,
