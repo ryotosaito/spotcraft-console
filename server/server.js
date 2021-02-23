@@ -68,7 +68,6 @@ io.on("connection", (socket) => {
 
 // watch minecraft server logs
 tail.on("line", function (data) {
-	console.log(data);
 	io.to("logs").emit("new_log", data + "\n");
 });
 

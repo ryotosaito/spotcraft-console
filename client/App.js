@@ -89,7 +89,7 @@ class App extends Component {
 	render() {
 		return (
 			<div className="App">
-				<h1> Minecraft Console ({process.env.NODE_ENV})</h1>
+				<h1>Minecraft Console</h1>
 				<form onSubmit={this.submitToken}>
 					<input
 						autoFocus
