@@ -1,15 +1,12 @@
-const path = require("path");
-const express = require("express");
+import { resolve } from "path";
+import { open, constants, readFileSync, write } from "fs";
+import { Tail } from "tail";
+
+// setup server
+import express from "express";
 const app = express();
 const server = require("http").createServer(app);
-const options = {
-	path: "/log",
-};
-const io = require("socket.io")(server, options);
-const port = 3000;
-const development = app.get("env") == "development";
-const fs = require("fs");
-const Tail = require("tail").Tail;
+const io = require("socket.io")(server, { path: "/log" });
 require("dotenv").config({
 	path: require("path").resolve(
 		process.cwd(),
@@ -17,19 +14,19 @@ require("dotenv").config({
 	),
 });
 
+// constants
+const port = 3000;
+const development = app.get("env") == "development";
 const tokenFileName = process.env.TOKEN_FILENAME;
 const logFileName = process.env.LOG_FILENAME;
-const tail = new Tail(logFileName);
-
 const pipeFileName = process.env.PIPE_FILENAME;
+
+// open files
 let pipeFile;
-fs.open(
-	pipeFileName,
-	fs.constants.O_RDWR | fs.constants.O_NONBLOCK,
-	(err, fd) => {
-		pipeFile = fd;
-	}
-);
+const tail = new Tail(logFileName);
+open(pipeFileName, constants.O_RDWR | constants.O_NONBLOCK, (err, fd) => {
+	pipeFile = fd;
+});
 
 // React
 if (development) {
@@ -42,13 +39,13 @@ if (development) {
 		})
 	);
 } else {
-	app.use("/", express.static(path.resolve(__dirname, "../client")));
+	app.use("/", express.static(resolve(__dirname, "../client")));
 }
 
 // WebSocket
 io.use((socket, next) => {
 	const token = socket.handshake.auth.token;
-	if (token == fs.readFileSync(tokenFileName).toString().trim()) {
+	if (token == readFileSync(tokenFileName).toString().trim()) {
 		next();
 	} else {
 		const err = new Error("not authorized");
@@ -58,12 +55,12 @@ io.use((socket, next) => {
 });
 
 io.on("connection", (socket) => {
-	console.log(socket.id);
-	socket.emit("init_log", fs.readFileSync(logFileName).toString());
+	console.log("connected:", socket.id);
+	socket.emit("init_log", readFileSync(logFileName).toString());
 	socket.join("logs");
 
 	socket.on("command", (command) => {
-		fs.write(pipeFile, command + "\n", (err) => {
+		write(pipeFile, command + "\n", (err) => {
 			if (err) console.error(err);
 		});
 	});

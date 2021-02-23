@@ -4,11 +4,13 @@
 	"description": "",
 	"private": true,
 	"scripts": {
+		"build:client": "webpack build --mode=production",
+		"build:server": "babel server/server.js -o build/server/server.js",
+		"build": "npm run build:client && npm run build:server && node scripts/build.js",
 		"client:dev": "webpack serve --mode=development",
-		"server:dev": "NODE_ENV=development nodemon server/server.js node",
+		"server:dev": "NODE_ENV=development nodemon --exec babel-node server/server.js",
 		"dev": "concurrently \"npm run client:dev\" \"npm run server:dev\"",
-		"build": "webpack build --mode=production && node build.js",
-		"server:prod": "NODE_ENV=production node server/server.js"
+		"start": "NODE_ENV=production node server/server.js"
 	},
 	"repository": {
 		"type": "git",
@@ -23,6 +25,7 @@
 	"devDependencies": {
 		"@babel/cli": "^7.12.16",
 		"@babel/core": "^7.12.16",
+		"@babel/node": "^7.13.0",
 		"@babel/preset-env": "^7.12.16",
 		"@babel/preset-react": "^7.12.13",
 		"babel-loader": "^8.2.2",
