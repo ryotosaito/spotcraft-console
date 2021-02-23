@@ -2,13 +2,13 @@
 	"name": "spotcraft-console",
 	"version": "1.0.0",
 	"description": "",
-	"main": "index.js",
+	"private": true,
 	"scripts": {
-		"client-dev": "webpack serve",
-		"server-dev": "NODE_ENV=development nodemon server.js node",
-		"dev": "concurrently \"npm run client-dev\" \"npm run server-dev\"",
-		"build": "webpack build",
-		"server-prod": "NODE_ENV=production node server.js"
+		"client:dev": "webpack serve --mode=development",
+		"server:dev": "NODE_ENV=development nodemon server.js node",
+		"dev": "concurrently \"npm run client:dev\" \"npm run server:dev\"",
+		"build": "webpack build --mode=production && node build.js",
+		"server:prod": "NODE_ENV=production node server.js"
 	},
 	"repository": {
 		"type": "git",
