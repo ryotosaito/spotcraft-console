@@ -10,6 +10,7 @@
 		"client:dev": "webpack serve --mode=development",
 		"server:dev": "NODE_ENV=development nodemon --exec babel-node server/server.js",
 		"dev": "concurrently \"npm run client:dev\" \"npm run server:dev\"",
+		"test": "eslint client server",
 		"start": "NODE_ENV=production node server/server.js"
 	},
 	"repository": {

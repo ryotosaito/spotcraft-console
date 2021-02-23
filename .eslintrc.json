@@ -7,6 +7,7 @@
 	"extends": "eslint:recommended",
 	"globals": {
 		"alert": false,
+		"document": false,
 		"window": false
 	},
 	"parserOptions": {
