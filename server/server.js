@@ -30,24 +30,21 @@ fs.open(
 	}
 );
 
-app.get("/", (req, res) => {
-	res.sendFile(__dirname + "/client/public/index.html");
-});
-
 // React
 if (development) {
+	app.get("/", (req, res) => {
+		res.sendFile(path.resolve(__dirname, "../client/public/index.html"));
+	});
 	const { createProxyMiddleware } = require("http-proxy-middleware");
 	app.use(
-		"/client/build/",
+		"/bundle.js",
 		createProxyMiddleware({
-			target: "http://localhost:8000",
+			target: "http://localhost:8000/",
 			changeOrigin: true,
 		})
 	);
 } else {
-	app.get("/client/build/bundle.js", (req, res) => {
-		res.sendFile(__dirname + "/client/build/bundle.js");
-	});
+	app.use("/", express.static(path.resolve(__dirname, "../client")));
 }
 
 // WebSocket
@@ -88,4 +85,5 @@ tail.on("error", function (error) {
 
 server.listen(port, () => {
 	console.log(`Example app listening at http://localhost:${port}`);
+	console.log(`mode: ${process.env.NODE_ENV}`);
 });

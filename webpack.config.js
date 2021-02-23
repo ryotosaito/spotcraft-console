@@ -21,14 +21,14 @@ module.exports = {
 	},
 	resolve: { extensions: ["*", ".js", ".jsx"] },
 	output: {
-		path: path.resolve(__dirname, "client/build/"),
-		publicPath: "/client/build/",
+		path: path.resolve(__dirname, "build/client"),
+		publicPath: "/",
 		filename: "bundle.js",
 	},
 	devServer: {
-		contentBase: path.join(__dirname, "client/public/"),
+		contentBase: path.join(__dirname, "client/"),
 		port: 8000,
-		publicPath: "http://localhost:8000/client/build/",
+		publicPath: "http://localhost:8000/",
 		hotOnly: true,
 	},
 	plugins: [
